@@ -15,7 +15,8 @@ APortal::APortal()
 void APortal::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	ArrowComponent = this->FindComponentByClass<UArrowComponent>();
 }
 
 // Called every frame
@@ -23,5 +24,44 @@ void APortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APortal::SetSceneCaptureRenderTarget()
+{
+	CaptureCamera = this->FindComponentByClass<USceneCaptureComponent2D>();
+	if (CaptureCamera != nullptr)
+	{
+		if (RenderTarget != nullptr)
+		{
+			CaptureCamera->TextureTarget = RenderTarget;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Render Target is null"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("CaptureCamera is null"));
+	}
+
+	SetMaterialInstanceOnStaticMesh();
+}
+
+void APortal::SetMaterialInstanceOnStaticMesh()
+{
+	PlaneMesh = this->FindComponentByClass<UStaticMeshComponent>();
+	
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(BaseMaterial, PlaneMesh, FName("Generated Material"));
+	if (DynamicMaterial != nullptr)
+	{
+		PlaneMesh->SetMaterial(0, DynamicMaterial);
+
+		DynamicMaterial->SetTextureParameterValue(TEXT("RenderTargetTexture"), RenderTarget);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create dynamic material on %s"), *PlaneMesh->GetName());
+	}
 }
 

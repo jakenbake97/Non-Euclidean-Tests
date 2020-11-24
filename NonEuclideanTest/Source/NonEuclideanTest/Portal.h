@@ -3,32 +3,47 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Components/ArrowComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/Actor.h"
 #include "Portal.generated.h"
 
 UCLASS()
 class NONEUCLIDEANTEST_API APortal : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	APortal();
+    GENERATED_BODY()
 
-	UFUNCTION(BlueprintPure, Category="Portal")
-	bool IsActive();
+public:
+    // Sets default values for this actor's properties
+    APortal();
 
-UFUNCTION(BlueprintCallable, Category="Portal")
-	void SetActive(bool Active);
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 
-	
+    UFUNCTION(BlueprintCallable, Category="Portal Scene Caputre")
+    void SetSceneCaptureRenderTarget();
+
+    void SetMaterialInstanceOnStaticMesh();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
+    UPROPERTY(EditAnywhere)
+    APortal* ExitPortal = nullptr;
 
+    UPROPERTY(EditAnywhere)
+    UMaterial* BaseMaterial = nullptr;
+
+    USceneCaptureComponent2D* CaptureCamera = nullptr;
+
+    UStaticMeshComponent* PlaneMesh = nullptr;
+
+    UArrowComponent* ArrowComponent = nullptr;
+
+    UPROPERTY(BlueprintReadWrite)
+    UTextureRenderTarget2D* RenderTarget = nullptr;
 };
