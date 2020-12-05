@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+
+#include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
@@ -46,4 +48,7 @@ public:
 
     UPROPERTY(BlueprintReadWrite)
     UTextureRenderTarget2D* RenderTarget = nullptr;
+
+    private:
+    UCameraComponent* PlayerCam;
 };

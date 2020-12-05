@@ -3,6 +3,10 @@
 
 #include "Portal.h"
 
+
+#include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 APortal::APortal()
 {
@@ -17,6 +21,9 @@ void APortal::BeginPlay()
 	Super::BeginPlay();
 
 	ArrowComponent = this->FindComponentByClass<UArrowComponent>();
+
+	const auto Player = UGameplayStatics::GetPlayerPawn(this, 0);
+	PlayerCam = Player->FindComponentByClass<UCameraComponent>();
 }
 
 // Called every frame
@@ -24,11 +31,13 @@ void APortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	const FVector VecToPlayer = GetActorLocation() - PlayerCam->GetComponentLocation();
+	CaptureCamera->SetRelativeLocation(VecToPlayer);
 }
 
 void APortal::SetSceneCaptureRenderTarget()
 {
-	CaptureCamera = this->FindComponentByClass<USceneCaptureComponent2D>();
+	CaptureCamera = ExitPortal->FindComponentByClass<USceneCaptureComponent2D>();
 	if (CaptureCamera != nullptr)
 	{
 		if (RenderTarget != nullptr)
