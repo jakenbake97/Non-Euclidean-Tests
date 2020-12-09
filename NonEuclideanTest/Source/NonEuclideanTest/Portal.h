@@ -44,11 +44,14 @@ public:
 
     UStaticMeshComponent* PlaneMesh = nullptr;
 
-    UArrowComponent* ArrowComponent = nullptr;
-
     UPROPERTY(BlueprintReadWrite)
     UTextureRenderTarget2D* RenderTarget = nullptr;
 
+    FTransform VisibleNormal;
+    FTransform InvisibleNormal;
+
     private:
     UCameraComponent* PlayerCam;
+    UArrowComponent* VisibleArrowComponent = nullptr;
+    UArrowComponent* InvisibleArrowComponent = nullptr;
 };

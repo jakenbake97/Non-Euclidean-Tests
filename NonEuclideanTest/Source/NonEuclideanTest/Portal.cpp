@@ -4,7 +4,9 @@
 #include "Portal.h"
 
 
+#include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
+#include "Chaos/ChaosDebugDraw.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -20,7 +22,24 @@ void APortal::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ArrowComponent = this->FindComponentByClass<UArrowComponent>();
+	TInlineComponentArray<UArrowComponent*> ArrowComps;
+	GetComponents(ArrowComps);
+
+	for(auto Arrow : ArrowComps)
+	{
+		if (Arrow->GetName() == "Visible")
+		{
+			VisibleArrowComponent = Arrow;
+		}
+		else if (Arrow->GetName() == "Invisible")
+		{
+			InvisibleArrowComponent = Arrow;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Arrow Component not Visible or Invisible"));
+		}
+	}
 
 	const auto Player = UGameplayStatics::GetPlayerPawn(this, 0);
 	PlayerCam = Player->FindComponentByClass<UCameraComponent>();
@@ -31,8 +50,13 @@ void APortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	const FVector VecToPlayer = GetActorLocation() - PlayerCam->GetComponentLocation();
-	CaptureCamera->SetRelativeLocation(VecToPlayer);
+	auto Transform = VisibleArrowComponent->GetComponentTransform();
+	const FVector VecToPlayer = PlayerCam->GetComponentLocation() - GetActorLocation();
+	auto TransformedVec = Transform.TransformVector(PlayerCam->GetComponentLocation());
+	auto InversedArrowTransform = Transform.Inverse().TransformVector(PlayerCam->GetComponentLocation());
+	
+
+	UE_LOG(LogTemp, Warning, TEXT("VecToPlayer: %s | ArrowTransform: %s| InversedArrowTransform: %s" ), *VecToPlayer.ToString(), *TransformedVec.ToString(), *InversedArrowTransform.ToString());
 }
 
 void APortal::SetSceneCaptureRenderTarget()
