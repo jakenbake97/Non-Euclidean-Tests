@@ -24,7 +24,7 @@ public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
-    UFUNCTION(BlueprintCallable, Category="Portal Scene Caputre")
+    UFUNCTION(BlueprintCallable, Category="Portal Scene Capture")
     void SetSceneCaptureRenderTarget();
 
     void SetMaterialInstanceOnStaticMesh();
@@ -40,18 +40,21 @@ public:
     UPROPERTY(EditAnywhere)
     UMaterial* BaseMaterial = nullptr;
 
+    UPROPERTY()
     USceneCaptureComponent2D* CaptureCamera = nullptr;
 
+    UPROPERTY()
     UStaticMeshComponent* PlaneMesh = nullptr;
 
     UPROPERTY(BlueprintReadWrite)
     UTextureRenderTarget2D* RenderTarget = nullptr;
 
-    FTransform VisibleNormal;
-    FTransform InvisibleNormal;
+    FVector VisibleNormal;
+    FRotator InitialCameraRotation;
 
     private:
+    UPROPERTY()
     UCameraComponent* PlayerCam;
-    UArrowComponent* VisibleArrowComponent = nullptr;
-    UArrowComponent* InvisibleArrowComponent = nullptr;
+
+    
 };

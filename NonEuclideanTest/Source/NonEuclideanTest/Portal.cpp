@@ -3,10 +3,7 @@
 
 #include "Portal.h"
 
-
-#include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
-#include "Chaos/ChaosDebugDraw.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -22,26 +19,9 @@ void APortal::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TInlineComponentArray<UArrowComponent*> ArrowComps;
-	GetComponents(ArrowComps);
+	VisibleNormal = GetActorForwardVector();
 
-	for(auto Arrow : ArrowComps)
-	{
-		if (Arrow->GetName() == "Visible")
-		{
-			VisibleArrowComponent = Arrow;
-		}
-		else if (Arrow->GetName() == "Invisible")
-		{
-			InvisibleArrowComponent = Arrow;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Arrow Component not Visible or Invisible"));
-		}
-	}
-
-	const auto Player = UGameplayStatics::GetPlayerPawn(this, 0);
+	const APawn* Player = UGameplayStatics::GetPlayerPawn(this, 0);
 	PlayerCam = Player->FindComponentByClass<UCameraComponent>();
 }
 
@@ -50,13 +30,17 @@ void APortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	auto Transform = VisibleArrowComponent->GetComponentTransform();
 	const FVector VecToPlayer = PlayerCam->GetComponentLocation() - GetActorLocation();
-	auto TransformedVec = Transform.TransformVector(PlayerCam->GetComponentLocation());
-	auto InversedArrowTransform = Transform.Inverse().TransformVector(PlayerCam->GetComponentLocation());
-	
 
-	UE_LOG(LogTemp, Warning, TEXT("VecToPlayer: %s | ArrowTransform: %s| InversedArrowTransform: %s" ), *VecToPlayer.ToString(), *TransformedVec.ToString(), *InversedArrowTransform.ToString());
+	const float Angle =  FMath::RadiansToDegrees(FGenericPlatformMath::Acos(FVector::DotProduct(VisibleNormal, VecToPlayer) / (VisibleNormal.Size() * VecToPlayer.Size())));
+	
+	UE_LOG(LogTemp, Warning, TEXT("Forward Vector: %s  |  Vector To Player: %s  |  Angle to between vectors: %f"), *VisibleNormal.ToString(), *VecToPlayer.ToString(), Angle);
+
+	const FRotator cameraRotation = FRotator(0.0f, InitialCameraRotation.Yaw + Angle, 0.0f);
+
+	CaptureCamera->SetRelativeRotation(cameraRotation);
+	
+	UE_LOG(LogTemp, Log, TEXT("Capture Camera Rotation: %s"), *CaptureCamera->GetRelativeRotation().ToString());
 }
 
 void APortal::SetSceneCaptureRenderTarget()
@@ -64,6 +48,7 @@ void APortal::SetSceneCaptureRenderTarget()
 	CaptureCamera = ExitPortal->FindComponentByClass<USceneCaptureComponent2D>();
 	if (CaptureCamera != nullptr)
 	{
+		InitialCameraRotation = CaptureCamera->GetRelativeRotation();
 		if (RenderTarget != nullptr)
 		{
 			CaptureCamera->TextureTarget = RenderTarget;
