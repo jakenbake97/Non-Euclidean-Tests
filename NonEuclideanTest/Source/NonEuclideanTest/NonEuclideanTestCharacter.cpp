@@ -84,6 +84,11 @@ ANonEuclideanTestCharacter::ANonEuclideanTestCharacter()
 	//bUsingMotionControllers = true;
 }
 
+ANonEuclideanTestPlayerController* ANonEuclideanTestCharacter::GetPlayerController() const
+{
+	return Cast<ANonEuclideanTestPlayerController>(GetWorld()->GetFirstPlayerController());
+}
+
 void ANonEuclideanTestCharacter::BeginPlay()
 {
 	// Call the base class  

@@ -16,47 +16,59 @@ class NONEUCLIDEANTEST_API APortal : public AActor
 {
     GENERATED_BODY()
 
-public:
-    // Sets default values for this actor's properties
     APortal();
-
-    // Called every frame
-    virtual void Tick(float DeltaTime) override;
-
-    UFUNCTION(BlueprintCallable, Category="Portal Scene Capture")
-    void SetSceneCaptureRenderTarget();
-
-    void SetMaterialInstanceOnStaticMesh();
-
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
 public:
-    UPROPERTY(EditAnywhere)
-    APortal* ExitPortal = nullptr;
+   virtual void Tick(float DeltaSeconds) override;
 
-    UPROPERTY(EditAnywhere)
-    UMaterial* BaseMaterial = nullptr;
+    UFUNCTION(BlueprintPure, Category="Portal")
+    bool IsActive() const;
+
+    UFUNCTION(BlueprintCallable, Category="Portal")
+    void SetActive(bool bActiveStatus);
+
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Portal")
+    void ClearRenderTarget();
+
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Portal")
+    void SetRenderTarget(UTexture* RenderTexture);
+
+    UFUNCTION(BlueprintNativeEvent, Category="Portal")
+    void ForceTick();
+
+    UFUNCTION(BlueprintPure, Category="Portal")
+    AActor* GetTarget() const;
+
+    UFUNCTION(BlueprintCallable, Category="Portal")
+    void SetTarget(AActor* NewTarget);
+
+    UFUNCTION(BlueprintCallable, Category="Portal")
+    bool IsPointInFrontOfPortal(FVector Point, FVector PortalLocation, FVector PortalNormal);
+
+    UFUNCTION(BlueprintCallable, Category="Portal")
+    bool IsPointCrossingPortal(FVector Point, FVector PortalLocation, FVector PortalNormal);
+
+    static FVector ConvertLocationToActorSpace(FVector Location, AActor* Reference, AActor* Target);
+
+    static FRotator ConvertRotationToActorSpace(FRotator Rotation, AActor* Reference, AActor* Target);
+
+    UFUNCTION(BlueprintCallable, Category="Portal")
+    void TeleportActor(AActor* ActorToTeleport);
+
+protected:
+    UPROPERTY(BlueprintReadOnly)
+    USceneComponent* PortalRootComponent;
+
+private:
+    bool bIsActive;
 
     UPROPERTY()
-    USceneCaptureComponent2D* CaptureCamera = nullptr; 
-    
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
-    USceneCaptureComponent2D* LocalCaptureComponent = nullptr;
+    AActor* Target;
 
-    UPROPERTY(EditAnywhere)
-    UStaticMeshComponent* PlaneMesh = nullptr;
+    FVector LastPosition;
 
-    UPROPERTY(BlueprintReadWrite)
-    UTextureRenderTarget2D* RenderTarget = nullptr;
-
-    FVector VisibleNormal;
-
-    private:
-    UPROPERTY()
-    UCameraComponent* PlayerCam;
-
-    UPROPERTY()
-    class ANonEuclideanTestPlayerController* PlayerController;
+    bool LastInFront;
 };

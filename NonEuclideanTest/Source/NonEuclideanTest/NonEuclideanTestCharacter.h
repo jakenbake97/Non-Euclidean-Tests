@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "NonEuclideanTestPlayerController.h"
 #include "GameFramework/Character.h"
 #include "NonEuclideanTestCharacter.generated.h"
 
@@ -47,6 +49,8 @@ class ANonEuclideanTestCharacter : public ACharacter
 
 public:
 	ANonEuclideanTestCharacter();
+
+	ANonEuclideanTestPlayerController* GetPlayerController() const;
 
 protected:
 	virtual void BeginPlay();
