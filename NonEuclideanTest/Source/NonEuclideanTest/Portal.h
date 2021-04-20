@@ -6,7 +6,6 @@
 
 
 #include "Camera/CameraComponent.h"
-#include "Components/ArrowComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/Actor.h"
@@ -41,20 +40,23 @@ public:
     UMaterial* BaseMaterial = nullptr;
 
     UPROPERTY()
-    USceneCaptureComponent2D* CaptureCamera = nullptr;
+    USceneCaptureComponent2D* CaptureCamera = nullptr; 
+    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    USceneCaptureComponent2D* LocalCaptureComponent = nullptr;
 
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     UStaticMeshComponent* PlaneMesh = nullptr;
 
     UPROPERTY(BlueprintReadWrite)
     UTextureRenderTarget2D* RenderTarget = nullptr;
 
     FVector VisibleNormal;
-    FRotator InitialCameraRotation;
 
     private:
     UPROPERTY()
     UCameraComponent* PlayerCam;
 
-    
+    UPROPERTY()
+    class ANonEuclideanTestPlayerController* PlayerController;
 };
